@@ -46,15 +46,11 @@ def create():
     if request.method == 'POST':
         # TODO: Get the new plant's name, variety, photo, & date planted, and
         # store them in the object below.
-        name = request.form.get('plant_name'),
-        variety = request.form.get('variety'),
-        photo_url = request.form.get('photo'),
-        date_planted = request.form.get('date_planted')
         new_plant = {
-            'name': name,
-            'variety': variety,
-            'photo_url': photo_url,
-            'date_planted': date_planted
+            'name': request.form.get('plant_name'),
+            'variety': request.form.get('variety'),
+            'photo_url': request.form.get('photo'),
+            'date_planted': request.form.get('date_planted')
         }
         # TODO: Make an `insert_one` database call to insert the object into the
         # database's `plants` collection, and get its inserted id. Pass the
@@ -98,12 +94,10 @@ def harvest(plant_id):
 
     # TODO: Create a new harvest object by passing in the form data from the
     # detail page form.
-    quantity = request.form.get('harvested_amount')
-    date_harvested = request.form.get('date_harvested')
     new_harvest = {
-        'quantity': quantity,  # e.g. '3 tomatoes'
-        'date': date_harvested,
-        'plant_id': Obejectid(plant_id)
+        'quantity': request.form.get('harvested_amount'),  # e.g. '3 tomatoes'
+        'date': request.form.get('date_harvested'),
+        'plant_id': ObjectId(plant_id)
     }
 
     # TODO: Make an `insert_one` database call to insert the object into the
@@ -118,10 +112,6 @@ def harvest(plant_id):
 def edit(plant_id):
     """Shows the edit page and accepts a POST request with edited data."""
 
-    new_name = request.form.get('plant_name')
-    new_variety = request.form.get('variety')
-    new_photo = request.form.get('photo')
-    new_date = request.form.get('date_planted')
     if request.method == 'POST':
         # TODO: Make an `update_one` database call to update the plant with the
         # given id. Make sure to put the updated fields in the `$set` object.
@@ -130,10 +120,10 @@ def edit(plant_id):
             {'_id': ObjectId(plant_id)},
             {
                 '$set': {
-                    'name': new_name,
-                    'variety': new_variety,
-                    'photo_url': new_photo,
-                    'date_planted': new_date
+                    'name': request.form.get('plant_name'),
+                    'variety': request.form.get('variety'),
+                    'photo_url': request.form.get('photo'),
+                    'date_planted': request.form.get('date_planted')
                 }
             }
         )
@@ -154,9 +144,11 @@ def edit(plant_id):
 def delete(plant_id):
     # TODO: Make a `delete_one` database call to delete the plant with the given
     # id.
+    mongo.db.plants.delete_one({'_id': ObjectId(plant_id)})
 
     # TODO: Also, make a `delete_many` database call to delete all harvests with
     # the given plant id.
+    mongo.db.harvests.delete_many({'plant_id': ObjectId(plant_id)})
 
     return redirect(url_for('plants_list'))
 
